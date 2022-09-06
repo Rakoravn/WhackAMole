@@ -6,8 +6,7 @@ using UnityEngine.UI;
 public class MoleBehaviour : MonoBehaviour
 {
     [SerializeField]
-    private Transform whackOverlay;
-    private List<Transform> imgList = new List<Transform>();
+    private List<Transform> minionList = new List<Transform>();
 
     private float TIMER_INTERVAL;
     private int ERRORS_MADE;
@@ -17,9 +16,6 @@ public class MoleBehaviour : MonoBehaviour
     private int randomTileTwo;
 
     private void Awake() {
-        foreach (Transform child in whackOverlay) {
-            imgList.Add(child);
-        }
     }
 
     void Start()
@@ -50,27 +46,33 @@ public class MoleBehaviour : MonoBehaviour
 
     IEnumerator ResetWhackModule(int index) {
         if(index == randomTileOne) {
-            imgList[index].GetComponent<Image>().color = new Color32(54, 57, 255, 255);
+            minionList[index].GetComponent<Image>().color = new Color32(54, 57, 255, 255);
             UiManager.instance.UpdateScore();
             Debug.Log("CORRECT");
         } else {
-            imgList[index].GetComponent<Image>().color = new Color32(255, 152, 54, 255);
+            minionList[index].GetComponent<Image>().color = new Color32(255, 152, 54, 255);
             CheckMistakes();
             Debug.Log("WRONG");
         }
 
         yield return new WaitForSeconds(.5f);
 
-        imgList[index].GetComponent<Image>().color = new Color32(165, 255, 54, 255);
+        minionList[index].GetComponent<Image>().color = new Color32(165, 255, 54, 255);
     }
 
     IEnumerator WhackGenerator() {
         showMoles = true;
         System.Random rnd = new System.Random();
-        randomTileOne = rnd.Next(imgList.Count);
-        imgList[randomTileOne].GetComponent<Image>().color = new Color32(255, 70, 54, 255);
+        randomTileOne = rnd.Next(minionList.Count);
+        Vector3 lerpValue = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
+            new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z)
+            , 5f);
+        minionList[randomTileOne].transform.localPosition = lerpValue;
         yield return new WaitForSeconds(TIMER_INTERVAL);
-        imgList[randomTileOne].GetComponent<Image>().color = new Color32(165, 255, 54, 255);
+        //minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
+            //new Vector3(minionList[randomTileOne].transform.localPosition.x, -5, minionList[randomTileOne].transform.localPosition.z)
+          //  , 5f);
+
         showMoles = false;
     }
 

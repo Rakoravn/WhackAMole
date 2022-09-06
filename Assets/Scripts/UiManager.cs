@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UiManager : MonoBehaviour
@@ -10,6 +11,8 @@ public class UiManager : MonoBehaviour
 
     public TextMeshProUGUI highscoreTxt;
     public TextMeshProUGUI currentScoreTxt;
+    public GameObject errorPanel; 
+    public Image errorImage;
 
     private int highscore = 0;
     private static int currentScore = 0;
