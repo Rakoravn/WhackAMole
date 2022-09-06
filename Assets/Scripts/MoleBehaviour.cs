@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class MoleBehaviour : MonoBehaviour
@@ -16,9 +17,7 @@ public class MoleBehaviour : MonoBehaviour
     private int randomTileOne;
     private int randomTileTwo;
 
-    public bool isPlaying;
-
-    public MistakeBehaviour mb;
+    private bool isPlaying;
 
     private Color startColor = new Color(0, 0, 0);
     private Color correctColor = new Color(0.3f, 1, 0);
@@ -27,8 +26,11 @@ public class MoleBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject gameOverMenu;
 
-    private void Awake() {
-    }
+    [SerializeField]
+    private TextMeshProUGUI countDownTxt;
+
+    private float countdownTimer = 3f;
+    private bool startGame = false;
 
     void Start()
     {
@@ -42,23 +44,36 @@ public class MoleBehaviour : MonoBehaviour
     void Update()
     {
         if (isPlaying) {
-            Debug.Log("HAA");   
-            if (!showMoles) {
-                StartCoroutine(WhackGenerator());
+            if (countdownTimer > 0 && !startGame) {
+                countdownTimer -= Time.deltaTime;
+                if(countdownTimer > 0.5f) {
+                    countDownTxt.text = countdownTimer.ToString("F0");
+                } else {
+                    countDownTxt.text = "";
+                }
+            } else {
+                startGame = true;
+                countDownTxt.gameObject.SetActive(false);
             }
-            if (Input.GetKeyDown(KeyCode.Q)) {
-                StartCoroutine(ResetWhackModule(0));
-            } else if (Input.GetKeyDown(KeyCode.W)) {
-                StartCoroutine(ResetWhackModule(1));
-            } else if (Input.GetKeyDown(KeyCode.E)) {
-                StartCoroutine(ResetWhackModule(2));
-            } else if (Input.GetKeyDown(KeyCode.A)) {
-                StartCoroutine(ResetWhackModule(3));
-            } else if (Input.GetKeyDown(KeyCode.S)) {
-                StartCoroutine(ResetWhackModule(4));
-            } else if (Input.GetKeyDown(KeyCode.D)) {
-                StartCoroutine(ResetWhackModule(5));
+            if (startGame) {
+                if (!showMoles) {
+                    StartCoroutine(WhackGenerator());
+                }
+                if (Input.GetKeyDown(KeyCode.Q)) {
+                    StartCoroutine(ResetWhackModule(0));
+                } else if (Input.GetKeyDown(KeyCode.W)) {
+                    StartCoroutine(ResetWhackModule(1));
+                } else if (Input.GetKeyDown(KeyCode.E)) {
+                    StartCoroutine(ResetWhackModule(2));
+                } else if (Input.GetKeyDown(KeyCode.A)) {
+                    StartCoroutine(ResetWhackModule(3));
+                } else if (Input.GetKeyDown(KeyCode.S)) {
+                    StartCoroutine(ResetWhackModule(4));
+                } else if (Input.GetKeyDown(KeyCode.D)) {
+                    StartCoroutine(ResetWhackModule(5));
+                }
             }
+
         }
     }
 
@@ -93,11 +108,15 @@ public class MoleBehaviour : MonoBehaviour
 
     public void StartGame() {
         isPlaying = true;
+        UiManager.instance.resetCurrentScore();
+        countDownTxt.gameObject.SetActive(true);
         gameOverMenu.SetActive(false);
     }
 
     public void GameOver() {
         isPlaying = false;
+        startGame = false;
+        countdownTimer = 3f;
         gameOverMenu.SetActive(true);
     }
 }

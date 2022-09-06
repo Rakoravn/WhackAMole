@@ -27,6 +27,7 @@ public class MistakeBehaviour : MonoBehaviour
                 child.gameObject.SetActive(false);
             }
             ERRORS_MADE = 0;
+            UiManager.instance.CheckIfHighscoreIsBeaten();
             MoleBehaviour.instance.GameOver();
         }
     }

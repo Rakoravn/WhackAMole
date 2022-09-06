@@ -28,13 +28,31 @@ public class UiManager : MonoBehaviour
             PlayerPrefs.SetInt("Highscore", highscore);
             PlayerPrefs.Save();
         } else {
-            highscore = PlayerPrefs.GetInt("highscore");
+            Debug.Log("AAAA");
+            highscore = PlayerPrefs.GetInt("Highscore");
+            Debug.Log(highscore);
         }
+            Debug.Log("BBBB");
         highscoreTxt.text = highscore.ToString();
     }
 
     public void UpdateScore() {
         currentScore++;
+        currentScoreTxt.text = currentScore.ToString();
+    }
+
+    public void CheckIfHighscoreIsBeaten() {
+        Debug.Log(currentScore + " - " + highscore);
+        if(currentScore > highscore) {
+            Debug.Log(currentScore);
+            PlayerPrefs.SetInt("Highscore", currentScore);
+            PlayerPrefs.Save();
+            CheckSetHighscore();
+        }
+    }
+
+    public void resetCurrentScore() {
+        currentScore = 0;
         currentScoreTxt.text = currentScore.ToString();
     }
 }
