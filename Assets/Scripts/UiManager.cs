@@ -11,8 +11,6 @@ public class UiManager : MonoBehaviour
 
     public TextMeshProUGUI highscoreTxt;
     public TextMeshProUGUI currentScoreTxt;
-    public GameObject errorPanel; 
-    public Image errorImage;
 
     private int highscore = 0;
     private static int currentScore = 0;
