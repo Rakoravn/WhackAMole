@@ -15,6 +15,10 @@ public class MoleBehaviour : MonoBehaviour
     private int randomTileOne;
     private int randomTileTwo;
 
+    private Color startColor = new Color(0, 0, 0);
+    private Color correctColor = new Color(0.3f, 1, 0);
+    private Color wrongColor = new Color(1, 0, 0.1f);
+
     private void Awake() {
     }
 
@@ -46,33 +50,43 @@ public class MoleBehaviour : MonoBehaviour
 
     IEnumerator ResetWhackModule(int index) {
         if(index == randomTileOne) {
-            minionList[index].GetComponent<Image>().color = new Color32(54, 57, 255, 255);
+            minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
             UiManager.instance.UpdateScore();
+            minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
+                new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z)
+                , 1f);
             Debug.Log("CORRECT");
         } else {
-            minionList[index].GetComponent<Image>().color = new Color32(255, 152, 54, 255);
+            minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
             CheckMistakes();
             Debug.Log("WRONG");
         }
 
         yield return new WaitForSeconds(.5f);
-
-        minionList[index].GetComponent<Image>().color = new Color32(165, 255, 54, 255);
+        minionList[index].parent.GetComponent<Renderer>().material.color = startColor;
     }
 
     IEnumerator WhackGenerator() {
         showMoles = true;
         System.Random rnd = new System.Random();
         randomTileOne = rnd.Next(minionList.Count);
-        Vector3 lerpValue = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
-            new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z)
-            , 5f);
-        minionList[randomTileOne].transform.localPosition = lerpValue;
+        /*while(minionList[randomTileOne].transform.localPosition.y < 2.5f) {
+            minionList[randomTileOne].transform.localPosition = Vector3.MoveTowards(minionList[randomTileOne].transform.localPosition,
+                new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z),
+                10f * Time.deltaTime);
+        }*/
+        minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
+            new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z),
+            1f);
         yield return new WaitForSeconds(TIMER_INTERVAL);
-        //minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
-            //new Vector3(minionList[randomTileOne].transform.localPosition.x, -5, minionList[randomTileOne].transform.localPosition.z)
-          //  , 5f);
-
+        /*while (minionList[randomTileOne].transform.localPosition.y > -5f) {
+            minionList[randomTileOne].transform.localPosition = Vector3.MoveTowards(minionList[randomTileOne].transform.localPosition,
+                new Vector3(minionList[randomTileOne].transform.localPosition.x, -5f, minionList[randomTileOne].transform.localPosition.z),
+                10f * Time.deltaTime);
+        }*/
+        minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
+            new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z)
+            , 1f);
         showMoles = false;
     }
 
