@@ -50,7 +50,7 @@ public class UiManager : MonoBehaviour
         }
     }
 
-    public void resetCurrentScore() {
+    public void ResetCurrentScore() {
         currentScore = 0;
         currentScoreTxt.text = currentScore.ToString();
     }

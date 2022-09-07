@@ -23,16 +23,15 @@ public class MistakeBehaviour : MonoBehaviour
         obj.SetActive(true);
         ERRORS_MADE++;
         if(ERRORS_MADE >= 3) {
-            foreach (Transform child in errorImagePanel.transform) {
-                child.gameObject.SetActive(false);
-            }
-            ERRORS_MADE = 0;
             UiManager.instance.CheckIfHighscoreIsBeaten();
             MoleBehaviour.instance.GameOver();
         }
     }
 
     public void ResetErrors() {
+        foreach (Transform child in errorImagePanel.transform) {
+            child.gameObject.SetActive(false);
+        }
         ERRORS_MADE = 0;
     }
 }

@@ -11,11 +11,12 @@ public class MoleBehaviour : MonoBehaviour
     [SerializeField]
     private List<Transform> minionList = new List<Transform>();
 
-    private float TIMER_INTERVAL;
+    private float TIMER_INTERVAL_MIN = 3.0f;
+    private float TIMER_INTERVAL_MAX = 3.5f;
 
     private bool showMoles = false;
     private int randomTileOne;
-    private int randomTileTwo;
+    private bool scoreCounted = false;
 
     private bool isPlaying;
 
@@ -47,7 +48,8 @@ public class MoleBehaviour : MonoBehaviour
         }
         difficulty = Difficulty.Easy;
         isPlaying = false;
-        TIMER_INTERVAL = 3.0f;
+        TIMER_INTERVAL_MIN = 2.5f;
+        TIMER_INTERVAL_MAX = 3.0f;
     }
 
     void Update()
@@ -87,13 +89,14 @@ public class MoleBehaviour : MonoBehaviour
     }
 
     IEnumerator ResetWhackModule(int index) {
-        if(index == randomTileOne) {
+        if(!scoreCounted && index == randomTileOne) {
             minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
             UiManager.instance.UpdateScore();
             minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
                 new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z)
                 , 1f);
             SetDifficulty();
+            scoreCounted = true;
         } else {
             minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
             MistakeBehaviour.instance.CheckMistakes();
@@ -104,12 +107,13 @@ public class MoleBehaviour : MonoBehaviour
 
     IEnumerator WhackGenerator() {
         showMoles = true;
-        System.Random rnd = new System.Random();
-        randomTileOne = rnd.Next(minionList.Count);
+        scoreCounted = false;
+        float timer = Random.Range(TIMER_INTERVAL_MIN, TIMER_INTERVAL_MAX);
+        randomTileOne = Random.Range(0, minionList.Count - 1);
         minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
             new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z),
             1f);
-        yield return new WaitForSeconds(TIMER_INTERVAL);
+        yield return new WaitForSeconds(timer);
         minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
             new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z)
             , 1f);
@@ -119,17 +123,14 @@ public class MoleBehaviour : MonoBehaviour
     private void SetDifficulty() {
         int currScore = UiManager.instance.GetCurrentScore();
         if(currScore == 10) {
-            Debug.Log("MEDIUM");
             difficulty = Difficulty.Medium;
             CheckDifficulty();
         }
         if(currScore == 20) {
-            Debug.Log("HARD");
             difficulty = Difficulty.Hard;
             CheckDifficulty();
         }
         if (currScore == 30) {
-            Debug.Log("IMPOSSIBLE");
             difficulty = Difficulty.Impossible;
             CheckDifficulty();
         }
@@ -138,20 +139,20 @@ public class MoleBehaviour : MonoBehaviour
     private void CheckDifficulty() {
         switch (difficulty) {
             case Difficulty.Easy:
-                Debug.Log("EASY TIME");
-                TIMER_INTERVAL = 3.0f;
+                TIMER_INTERVAL_MIN = 2.5f;
+                TIMER_INTERVAL_MAX = 3.0f;
                 break;
             case Difficulty.Medium:
-                Debug.Log("MEDIUM TIME");
-                TIMER_INTERVAL = 2.5f;
+                TIMER_INTERVAL_MIN = 2.0f;
+                TIMER_INTERVAL_MAX = 2.5f;
                 break;
             case Difficulty.Hard:
-                Debug.Log("HARD TIME");
-                TIMER_INTERVAL = 2.0f;
+                TIMER_INTERVAL_MIN = 1.5f;
+                TIMER_INTERVAL_MAX = 2.0f;
                 break;
             case Difficulty.Impossible:
-                Debug.Log("IMPOSSIBLE TIME");
-                TIMER_INTERVAL = 1.5f;
+                TIMER_INTERVAL_MIN = 1.0f;
+                TIMER_INTERVAL_MAX = 1.5f;
                 break;
         }
     }
