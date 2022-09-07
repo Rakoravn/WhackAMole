@@ -31,4 +31,8 @@ public class MistakeBehaviour : MonoBehaviour
             MoleBehaviour.instance.GameOver();
         }
     }
+
+    public void ResetErrors() {
+        ERRORS_MADE = 0;
+    }
 }

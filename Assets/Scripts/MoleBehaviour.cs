@@ -31,12 +31,21 @@ public class MoleBehaviour : MonoBehaviour
 
     private float countdownTimer = 3f;
     private bool startGame = false;
+    private Difficulty difficulty;
+
+    private enum Difficulty {
+        Easy,
+        Medium,
+        Hard,
+        Impossible
+    }
 
     void Start()
     {
         if (!instance) {
             instance = this;
         }
+        difficulty = Difficulty.Easy;
         isPlaying = false;
         TIMER_INTERVAL = 3.0f;
     }
@@ -84,6 +93,7 @@ public class MoleBehaviour : MonoBehaviour
             minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
                 new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z)
                 , 1f);
+            SetDifficulty();
         } else {
             minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
             MistakeBehaviour.instance.CheckMistakes();
@@ -106,9 +116,50 @@ public class MoleBehaviour : MonoBehaviour
         showMoles = false;
     }
 
+    private void SetDifficulty() {
+        int currScore = UiManager.instance.GetCurrentScore();
+        if(currScore == 10) {
+            Debug.Log("MEDIUM");
+            difficulty = Difficulty.Medium;
+            CheckDifficulty();
+        }
+        if(currScore == 20) {
+            Debug.Log("HARD");
+            difficulty = Difficulty.Hard;
+            CheckDifficulty();
+        }
+        if (currScore == 30) {
+            Debug.Log("IMPOSSIBLE");
+            difficulty = Difficulty.Impossible;
+            CheckDifficulty();
+        }
+    }
+
+    private void CheckDifficulty() {
+        switch (difficulty) {
+            case Difficulty.Easy:
+                Debug.Log("EASY TIME");
+                TIMER_INTERVAL = 3.0f;
+                break;
+            case Difficulty.Medium:
+                Debug.Log("MEDIUM TIME");
+                TIMER_INTERVAL = 2.5f;
+                break;
+            case Difficulty.Hard:
+                Debug.Log("HARD TIME");
+                TIMER_INTERVAL = 2.0f;
+                break;
+            case Difficulty.Impossible:
+                Debug.Log("IMPOSSIBLE TIME");
+                TIMER_INTERVAL = 1.5f;
+                break;
+        }
+    }
+
     public void StartGame() {
         isPlaying = true;
-        UiManager.instance.resetCurrentScore();
+        UiManager.instance.ResetCurrentScore();
+        MistakeBehaviour.instance.ResetErrors();
         countDownTxt.gameObject.SetActive(true);
         gameOverMenu.SetActive(false);
     }
