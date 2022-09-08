@@ -10,8 +10,8 @@ public class MoleBehaviour : MonoBehaviour {
     [SerializeField]
     private List<Transform> minionList = new List<Transform>();
 
-    private float TIMER_INTERVAL_MIN = 3.5f;
-    private float TIMER_INTERVAL_MAX = 4.0f;
+    private float TIMER_INTERVAL_MIN;
+    private float TIMER_INTERVAL_MAX;
 
     private bool showMoles = false;
     private int randomTileOne;
@@ -22,6 +22,11 @@ public class MoleBehaviour : MonoBehaviour {
     private bool scoreCountedSecond = false;
     private int chanceToSpawnTwo;
     private bool spawnSecondMole = false;
+    private bool minionSpawned = false;
+
+    float duration = 0.1f;
+    float popOutTime = 0;
+    float popInTime = 0;
 
     private bool isPlaying;
 
@@ -46,15 +51,15 @@ public class MoleBehaviour : MonoBehaviour {
         Impossible
     }
 
-    void Start() {
+    private void Awake() {
         if (!instance) {
             instance = this;
         }
-        difficulty = Difficulty.Easy;
+    }
+
+    void Start() {
+        SetDifficulty();
         isPlaying = false;
-        chanceToSpawnTwo = 20;
-        TIMER_INTERVAL_MIN = 2.5f;
-        TIMER_INTERVAL_MAX = 3.0f;
     }
 
     void Update() {
@@ -93,27 +98,31 @@ public class MoleBehaviour : MonoBehaviour {
     }
 
     IEnumerator ResetWhackModule(int index) {
-        if (!scoreCountedFirst && index == randomTileOne) {
-            minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
-            UiManager.instance.UpdateScore();
-            minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
-                new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
-            SetDifficulty();
-            scoreCountedFirst = true;
-        } else if (spawnSecondMole && !scoreCountedSecond && index == randomTileTwo) {
-            minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
-            UiManager.instance.UpdateScore();
-            minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
-                new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
-            SetDifficulty();
-            scoreCountedSecond = true;
+        if (minionSpawned) {
+            if (!scoreCountedFirst && index == randomTileOne) {
+                minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
+                UiManager.instance.UpdateScore();
+                minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
+                    new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
+                SetDifficulty();
+                scoreCountedFirst = true;
+            } else if (spawnSecondMole && !scoreCountedSecond && index == randomTileTwo) {
+                minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
+                UiManager.instance.UpdateScore();
+                minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
+                    new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
+                SetDifficulty();
+                scoreCountedSecond = true;
+            }
+            else {
+                minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
+                MistakeBehaviour.instance.CheckMistakes();
+            }
+            yield return new WaitForSeconds(.5f);
+            minionList[index].parent.GetComponent<Renderer>().material.color = startColor;
+        } else {
+            yield return new WaitForEndOfFrame();
         }
-        else {
-            minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
-            MistakeBehaviour.instance.CheckMistakes();
-        }
-        yield return new WaitForSeconds(.5f);
-        minionList[index].parent.GetComponent<Renderer>().material.color = startColor;
     }
 
     IEnumerator WhackGenerator() {
@@ -123,29 +132,50 @@ public class MoleBehaviour : MonoBehaviour {
         float timer = Random.Range(TIMER_INTERVAL_MIN, TIMER_INTERVAL_MAX);
         while (randomTileOne == tempTileOne) { randomTileOne = Random.Range(0, minionList.Count - 1); }
         tempTileOne = randomTileOne;
-        minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
-            new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z), 1f);
-        //int spawnTwoGenerator = Random.Range(0, 100);
-        /*if (spawnTwoGenerator <= chanceToSpawnTwo) {
-            while (randomTileTwo == tempTileTwo && randomTileTwo != randomTileOne) { randomTileTwo = Random.Range(0, minionList.Count - 1); }
+        StartCoroutine(PopUpMinion(randomTileOne));
+        minionSpawned = true;
+        int spawnTwoGenerator = Random.Range(0, 100);
+        if (spawnTwoGenerator <= chanceToSpawnTwo) {
+            while (randomTileTwo == tempTileTwo && randomTileTwo == randomTileOne) { randomTileTwo = Random.Range(0, minionList.Count - 1); }
             tempTileTwo = randomTileTwo;
-            minionList[randomTileTwo].transform.localPosition = Vector3.Lerp(minionList[randomTileTwo].transform.localPosition,
-                new Vector3(minionList[randomTileTwo].transform.localPosition.x, 2.5f, minionList[randomTileTwo].transform.localPosition.z), 1f);
+            StartCoroutine(PopUpMinion(randomTileTwo));
             spawnSecondMole = true;
-        }*/
+        }
         yield return new WaitForSeconds(timer);
-        minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
-            new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z), 1f);
-        /*if (spawnSecondMole) {
-            minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
-                new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z), 1f);
+        StartCoroutine(PopInMinion(randomTileOne));
+        if (spawnSecondMole) {
+            StartCoroutine(PopInMinion(randomTileTwo));
             spawnSecondMole = false;
-        }*/
+        }
         showMoles = false;
+    }
+
+    IEnumerator PopUpMinion(int index) {
+        popOutTime = 0;
+        while (popOutTime < duration) {
+            minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
+                new Vector3(minionList[index].transform.localPosition.x, 2.5f, minionList[index].transform.localPosition.z), popOutTime / duration);
+            popOutTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    IEnumerator PopInMinion(int index) {
+        popInTime = 0;
+        while (popInTime < duration) {
+            minionList[index].transform.localPosition = Vector3.Lerp(minionList[index].transform.localPosition,
+                new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), popInTime / duration);
+            popInTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     private void SetDifficulty() {
         int currScore = UiManager.instance.GetCurrentScore();
+        if (currScore < 10) {
+            difficulty = Difficulty.Easy;
+            CheckDifficulty();
+        }
         if (currScore == 10) {
             difficulty = Difficulty.Medium;
             CheckDifficulty();
@@ -164,23 +194,23 @@ public class MoleBehaviour : MonoBehaviour {
         switch (difficulty) {
             case Difficulty.Easy:
                 chanceToSpawnTwo = 20;
-                TIMER_INTERVAL_MIN = 3.5f;
                 TIMER_INTERVAL_MAX = 4.0f;
+                TIMER_INTERVAL_MIN = 3.5f;
                 break;
             case Difficulty.Medium:
                 chanceToSpawnTwo = 30;
-                TIMER_INTERVAL_MIN = 3.0f;
                 TIMER_INTERVAL_MAX = 3.5f;
+                TIMER_INTERVAL_MIN = 3.0f;
                 break;
             case Difficulty.Hard:
                 chanceToSpawnTwo = 40;
-                TIMER_INTERVAL_MIN = 2.5f;
                 TIMER_INTERVAL_MAX = 3.0f;
+                TIMER_INTERVAL_MIN = 2.5f;
                 break;
             case Difficulty.Impossible:
                 chanceToSpawnTwo = 50;
-                TIMER_INTERVAL_MIN = 2.0f;
                 TIMER_INTERVAL_MAX = 2.5f;
+                TIMER_INTERVAL_MIN = 2.0f;
                 break;
         }
     }

@@ -11,10 +11,13 @@ public class MistakeBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject errorImagePanel;
 
-    void Start() {
+    private void Awake() {
         if (!instance) {
             instance = this;
         }
+    }
+
+    void Start() {
         ERRORS_MADE = 0;
     }
 

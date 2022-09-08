@@ -14,13 +14,16 @@ public class UiManager : MonoBehaviour
     public TextMeshProUGUI newHighscoreTxt;
 
     private int highscore = 0;
-    private static int currentScore = 0;
+    private int currentScore = 0;
 
-    void Start()
-    {
+    private void Awake() {
         if (!instance) {
             instance = this;
         }
+    }
+
+    void Start()
+    {
         CheckSetHighscore();
     }
 
