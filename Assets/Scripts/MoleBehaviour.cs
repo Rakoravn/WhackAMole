@@ -10,12 +10,14 @@ public class MoleBehaviour : MonoBehaviour {
     [SerializeField]
     private List<Transform> minionList = new List<Transform>();
 
-    private float TIMER_INTERVAL_MIN = 3.0f;
-    private float TIMER_INTERVAL_MAX = 3.5f;
+    private float TIMER_INTERVAL_MIN = 3.5f;
+    private float TIMER_INTERVAL_MAX = 4.0f;
 
     private bool showMoles = false;
     private int randomTileOne;
+    private int tempTileOne;
     private int randomTileTwo;
+    private int tempTileTwo;
     private bool scoreCountedFirst = false;
     private bool scoreCountedSecond = false;
     private int chanceToSpawnTwo;
@@ -119,26 +121,26 @@ public class MoleBehaviour : MonoBehaviour {
         scoreCountedFirst = false;
         scoreCountedSecond = false;
         float timer = Random.Range(TIMER_INTERVAL_MIN, TIMER_INTERVAL_MAX);
-        randomTileOne = Random.Range(0, minionList.Count - 1);
+        while (randomTileOne == tempTileOne) { randomTileOne = Random.Range(0, minionList.Count - 1); }
+        tempTileOne = randomTileOne;
         minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
             new Vector3(minionList[randomTileOne].transform.localPosition.x, 2.5f, minionList[randomTileOne].transform.localPosition.z), 1f);
-        int spawnTwoGenerator = Random.Range(0, 100);
-        if (spawnTwoGenerator <= chanceToSpawnTwo) {
-            randomTileTwo = Random.Range(0, minionList.Count - 1);
-            if (randomTileTwo != randomTileOne) {
-                minionList[randomTileTwo].transform.localPosition = Vector3.Lerp(minionList[randomTileTwo].transform.localPosition,
-                    new Vector3(minionList[randomTileTwo].transform.localPosition.x, 2.5f, minionList[randomTileTwo].transform.localPosition.z), 1f);
-                spawnSecondMole = true;
-            }
-        }
+        //int spawnTwoGenerator = Random.Range(0, 100);
+        /*if (spawnTwoGenerator <= chanceToSpawnTwo) {
+            while (randomTileTwo == tempTileTwo && randomTileTwo != randomTileOne) { randomTileTwo = Random.Range(0, minionList.Count - 1); }
+            tempTileTwo = randomTileTwo;
+            minionList[randomTileTwo].transform.localPosition = Vector3.Lerp(minionList[randomTileTwo].transform.localPosition,
+                new Vector3(minionList[randomTileTwo].transform.localPosition.x, 2.5f, minionList[randomTileTwo].transform.localPosition.z), 1f);
+            spawnSecondMole = true;
+        }*/
         yield return new WaitForSeconds(timer);
         minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
             new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z), 1f);
-        if (spawnSecondMole) {
+        /*if (spawnSecondMole) {
             minionList[randomTileOne].transform.localPosition = Vector3.Lerp(minionList[randomTileOne].transform.localPosition,
                 new Vector3(minionList[randomTileOne].transform.localPosition.x, -3f, minionList[randomTileOne].transform.localPosition.z), 1f);
             spawnSecondMole = false;
-        }
+        }*/
         showMoles = false;
     }
 
@@ -162,23 +164,23 @@ public class MoleBehaviour : MonoBehaviour {
         switch (difficulty) {
             case Difficulty.Easy:
                 chanceToSpawnTwo = 20;
+                TIMER_INTERVAL_MIN = 3.5f;
+                TIMER_INTERVAL_MAX = 4.0f;
+                break;
+            case Difficulty.Medium:
+                chanceToSpawnTwo = 30;
+                TIMER_INTERVAL_MIN = 3.0f;
+                TIMER_INTERVAL_MAX = 3.5f;
+                break;
+            case Difficulty.Hard:
+                chanceToSpawnTwo = 40;
                 TIMER_INTERVAL_MIN = 2.5f;
                 TIMER_INTERVAL_MAX = 3.0f;
                 break;
-            case Difficulty.Medium:
-                chanceToSpawnTwo = 35;
+            case Difficulty.Impossible:
+                chanceToSpawnTwo = 50;
                 TIMER_INTERVAL_MIN = 2.0f;
                 TIMER_INTERVAL_MAX = 2.5f;
-                break;
-            case Difficulty.Hard:
-                chanceToSpawnTwo = 50;
-                TIMER_INTERVAL_MIN = 1.5f;
-                TIMER_INTERVAL_MAX = 2.0f;
-                break;
-            case Difficulty.Impossible:
-                chanceToSpawnTwo = 65;
-                TIMER_INTERVAL_MIN = 1.0f;
-                TIMER_INTERVAL_MAX = 1.5f;
                 break;
         }
     }

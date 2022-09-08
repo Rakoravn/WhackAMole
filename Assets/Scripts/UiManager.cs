@@ -6,11 +6,12 @@ using UnityEngine.UI;
 using TMPro;
 
 public class UiManager : MonoBehaviour
-{
+{ 
     public static UiManager instance;
 
     public TextMeshProUGUI highscoreTxt;
     public TextMeshProUGUI currentScoreTxt;
+    public TextMeshProUGUI newHighscoreTxt;
 
     private int highscore = 0;
     private static int currentScore = 0;
@@ -46,7 +47,10 @@ public class UiManager : MonoBehaviour
         if(currentScore > highscore) {
             PlayerPrefs.SetInt("Highscore", currentScore);
             PlayerPrefs.Save();
+            newHighscoreTxt.gameObject.SetActive(true);
             CheckSetHighscore();
+        } else {
+            newHighscoreTxt.gameObject.SetActive(false);
         }
     }
 
