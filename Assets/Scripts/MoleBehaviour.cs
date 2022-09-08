@@ -106,6 +106,7 @@ public class MoleBehaviour : MonoBehaviour {
                     new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
                 SetDifficulty();
                 scoreCountedFirst = true;
+                SoundBehaviour.instance.PlaySuccessSound();
             } else if (spawnSecondMole && !scoreCountedSecond && index == randomTileTwo) {
                 minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
                 UiManager.instance.UpdateScore();
@@ -113,10 +114,11 @@ public class MoleBehaviour : MonoBehaviour {
                     new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
                 SetDifficulty();
                 scoreCountedSecond = true;
-            }
-            else {
+                SoundBehaviour.instance.PlaySuccessSound();
+            } else {
                 minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
                 MistakeBehaviour.instance.CheckMistakes();
+                SoundBehaviour.instance.PlayErrorSound();
             }
             yield return new WaitForSeconds(.5f);
             minionList[index].parent.GetComponent<Renderer>().material.color = startColor;
@@ -158,6 +160,7 @@ public class MoleBehaviour : MonoBehaviour {
             popOutTime += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        SoundBehaviour.instance.PlayPushOutSound();
     }
 
     IEnumerator PopInMinion(int index) {
@@ -168,6 +171,7 @@ public class MoleBehaviour : MonoBehaviour {
             popInTime += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        SoundBehaviour.instance.PlayPushInSound();
     }
 
     private void SetDifficulty() {
