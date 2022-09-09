@@ -13,48 +13,29 @@ public class SoundBehaviour : MonoBehaviour
     public AudioClip pushOutSound;
     public AudioClip pushInSound;
 
-    public AudioClip mainSong;
-
     private void Awake() {
         if (!instance) {
             instance = this;
         }
     }
 
-    void Start()
-    {
+    void Start() {
         audioSource = GetComponent<AudioSource>();
-        audioSource.loop = true;
-        audioSource.clip = mainSong;
-        audioSource.volume = 0.8f;
-        audioSource.Play();
     }
 
     public void PlaySuccessSound() {
-        audioSource.loop = false;
-        audioSource.clip = successSound;
-        audioSource.volume = 1f;
-        audioSource.Play();
+        audioSource.PlayOneShot(successSound);
     }
 
     public void PlayErrorSound() {
-        audioSource.loop = false;
-        audioSource.clip = errorSound;
-        audioSource.volume = 1f;
-        audioSource.Play();
+        audioSource.PlayOneShot(errorSound);
     }
 
     public void PlayPushOutSound() {
-        audioSource.loop = false;
-        audioSource.clip = pushOutSound;
-        audioSource.volume = 1f;
-        audioSource.Play();
+        audioSource.PlayOneShot(pushOutSound);
     }
 
     public void PlayPushInSound() {
-        audioSource.loop = false;
-        audioSource.clip = pushInSound;
-        audioSource.volume = 1f;
-        audioSource.Play();
+        audioSource.PlayOneShot(pushInSound);
     }
 }

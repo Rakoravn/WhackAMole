@@ -24,6 +24,9 @@ public class MoleBehaviour : MonoBehaviour {
     private bool spawnSecondMole = false;
     private bool minionSpawned = false;
 
+    private bool gotFirstMole = false;
+    private bool gotSecondMole = false;
+
     float duration = 0.1f;
     float popOutTime = 0;
     float popInTime = 0;
@@ -93,7 +96,12 @@ public class MoleBehaviour : MonoBehaviour {
                     StartCoroutine(ResetWhackModule(5));
                 }
             }
-
+        } else {
+            if (Input.GetKeyDown(KeyCode.S)) {
+                if (!isPlaying) {
+                    StartGame();
+                }
+            }
         }
     }
 
@@ -106,6 +114,7 @@ public class MoleBehaviour : MonoBehaviour {
                     new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
                 SetDifficulty();
                 scoreCountedFirst = true;
+                gotFirstMole = true;
                 SoundBehaviour.instance.PlaySuccessSound();
             } else if (spawnSecondMole && !scoreCountedSecond && index == randomTileTwo) {
                 minionList[index].parent.GetComponent<Renderer>().material.color = correctColor;
@@ -114,6 +123,7 @@ public class MoleBehaviour : MonoBehaviour {
                     new Vector3(minionList[index].transform.localPosition.x, -3f, minionList[index].transform.localPosition.z), 1f);
                 SetDifficulty();
                 scoreCountedSecond = true;
+                gotSecondMole = true;
                 SoundBehaviour.instance.PlaySuccessSound();
             } else {
                 minionList[index].parent.GetComponent<Renderer>().material.color = wrongColor;
@@ -131,6 +141,8 @@ public class MoleBehaviour : MonoBehaviour {
         showMoles = true;
         scoreCountedFirst = false;
         scoreCountedSecond = false;
+        gotFirstMole = false;
+        gotSecondMole = false;
         float timer = Random.Range(TIMER_INTERVAL_MIN, TIMER_INTERVAL_MAX);
         while (randomTileOne == tempTileOne) { randomTileOne = Random.Range(0, minionList.Count - 1); }
         tempTileOne = randomTileOne;
@@ -144,8 +156,10 @@ public class MoleBehaviour : MonoBehaviour {
             spawnSecondMole = true;
         }
         yield return new WaitForSeconds(timer);
-        StartCoroutine(PopInMinion(randomTileOne));
-        if (spawnSecondMole) {
+        if (!gotFirstMole) {
+            StartCoroutine(PopInMinion(randomTileOne));
+        }
+        if (spawnSecondMole && !gotSecondMole) {
             StartCoroutine(PopInMinion(randomTileTwo));
             spawnSecondMole = false;
         }
