@@ -84,15 +84,20 @@ public class MoleBehaviour : MonoBehaviour {
                 }
                 if (Input.GetKeyDown(KeyCode.Q)) {
                     StartCoroutine(ResetWhackModule(0));
-                } else if (Input.GetKeyDown(KeyCode.W)) {
+                }
+                if (Input.GetKeyDown(KeyCode.W)) {
                     StartCoroutine(ResetWhackModule(1));
-                } else if (Input.GetKeyDown(KeyCode.E)) {
+                }
+                if (Input.GetKeyDown(KeyCode.E)) {
                     StartCoroutine(ResetWhackModule(2));
-                } else if (Input.GetKeyDown(KeyCode.A)) {
+                }
+                if (Input.GetKeyDown(KeyCode.A)) {
                     StartCoroutine(ResetWhackModule(3));
-                } else if (Input.GetKeyDown(KeyCode.S)) {
+                }
+                if (Input.GetKeyDown(KeyCode.S)) {
                     StartCoroutine(ResetWhackModule(4));
-                } else if (Input.GetKeyDown(KeyCode.D)) {
+                }
+                if (Input.GetKeyDown(KeyCode.D)) {
                     StartCoroutine(ResetWhackModule(5));
                 }
             }
